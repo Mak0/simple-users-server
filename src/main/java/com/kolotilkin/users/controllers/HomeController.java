@@ -9,7 +9,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String index() {
-        return "{status:'up'}";
+        return "{\"status\":'\"up\"}";
     }
 
     @GetMapping("/joke")
