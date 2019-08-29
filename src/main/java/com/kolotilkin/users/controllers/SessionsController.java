@@ -7,6 +7,8 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.keys.HmacKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,11 +20,11 @@ public class SessionsController {
     private UsersRepository repository;
 
     @PostMapping(path = "/session")
-    public String login(@RequestParam(name = "email") String email, @RequestParam(name = "password") String password) {
+    public ResponseEntity<String> login(@RequestParam(name = "email") String email, @RequestParam(name = "password") String password) {
 
         User user = repository.findByEmail(email);
         if(user == null) {
-            return "{\"error\":\"User not found\"}";
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         } else if (user.getPassword().equals(password)) {
             JwtContent content = new JwtContent(user.getId(), user.getEmail());
 
@@ -34,12 +36,12 @@ public class SessionsController {
 
             try {
                 String s = jwt.getCompactSerialization();
-                return "{\"error\":\"SRV.JWS." + s + "\"}";
+                return new ResponseEntity<>("SRV.JWS." + s, HttpStatus.CREATED);
             } catch (Exception ex) {
-                return "{\"error\":\"" + ex.getMessage() +"\"}";
+                return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return "{\"error\":\"Incorrect password\"}";
+            return new ResponseEntity<>("Incorrect Password", HttpStatus.FORBIDDEN);
         }
     }
 }
