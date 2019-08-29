@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class JokeController {
 
     @GetMapping("/joke")
-    public ResponseEntity<String> joke() {
+    public ResponseEntity<String> joke() throws Exception {
         RestTemplate template = new RestTemplate();
         String response = template.getForObject("http://api.icndb.com/jokes/random", String.class);
 
